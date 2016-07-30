@@ -1,0 +1,209 @@
+## imapproxy.conf
+##
+## This is the global configuration file for imapproxy.
+## Lines beginning with a '#' sign are treated as comments and will be
+## ignored.  Each line to be processed must be a space delimited
+## keyword/value pair.  
+##
+
+#
+## server_hostname
+##
+## This setting controls which imap server we proxy our connections to.
+#
+server_hostname {{ default .Env.SERVER_HOSTNAME "localhost" }}
+
+
+#
+## connect_retries
+##
+## This setting controls how many times we retry connecting to our server.
+## The delay between retries is configurable with 'connect_delay'
+#
+connect_retries {{ default .Env.CONNECT_RETRIES "10" }}
+connect_delay {{ default .Env.CONNECT_DELAY "5" }}
+
+#
+## cache_size
+##
+## This setting determines how many in-core imap connection structures
+## will be allocated.  As such, it determines not only how many cached
+## connections will be allowed, but really the total number of simultaneous
+## connections, cached and active.
+#
+cache_size {{ default .Env.CACHE_SIZE "3072" }}
+
+
+#
+## listen_port
+##
+## This setting specifies which port the proxy server will bind to and
+## accept incoming connections from.
+#
+listen_port {{ default .Env.LISTEN_PORT "143" }}
+
+
+#
+## listen_address
+##
+## This setting specifies which address the proxy server will bind to and
+## accept incoming connections to.  If undefined, bind to all.
+## Must be a dotted decimal IP address.
+#
+#listen_address 127.0.0.1
+listen_address {{ default .Env.LISTEN_ADDRESS "0.0.0.0" }}
+
+
+#
+## server_port
+##
+## This setting specifies the port that server_hostname is listening on.
+## This is the tcp port that we proxy inbound connections to.
+# 
+server_port {{ default .Env.SERVER_PORT "143" }}
+
+#
+## cache_expiration_time
+##
+## This setting controls how many seconds an inactive connection will be
+## cached.
+#
+cache_expiration_time {{ default .Env.CACHE_EXPIRATION_TIME "300" }}
+
+
+#
+## proc_username
+##
+## This setting controls which username the imap proxy process will run as.
+## It is not allowed to run as "root".
+#
+proc_username {{ default .Env.PROC_USERNAME "nobody" }}
+
+#
+## proc_groupname
+##
+## This setting controls which groupname the imap proxy process will run as.
+#
+proc_groupname {{ default .Env.PROC_GROUPNAME "nobody" }}
+
+
+#
+## stat_filename
+##
+## This is the path to the filename that the proxy server mmap()s to
+## write statistical data to.  This is the file that pimpstat needs to
+## look at to be able to provide his useful stats.
+#
+stat_filename {{ default .Env.STAT_FILENAME "/var/run/pimpstats" }}
+
+
+#
+## protocol_log_filename
+##
+## protocol logging may only be turned on for one user at a time.  All
+## protocol logging data is written to the file specified by this path.
+#
+protocol_log_filename {{ default .Env.PROTOCOL_LOG_FILENAME "/tmp/imapproxy_protocol.log" }}
+
+
+#
+## syslog_facility
+##
+## The logging facility to be used for all syslog calls.  If nothing is
+## specified here, it will default to LOG_MAIL.  Any of the possible
+## facilities listed in the syslog(3C) manpage may be used here except
+## LOG_KERN.
+#
+syslog_facility {{ default .Env.SYSLOG_FACILITY "LOG_MAIL" }}
+
+
+#
+## syslog_prioritymask
+##
+## This configuration option is provided as a way to limit the verbosity
+## of imapproxy.  If no value is specified, it will default to no priority
+## mask and you'll see all possible log messages.  Any of the possible
+## priority values listed in the syslog(3C) manpage may be used here.
+## By default, I've left this commented out so you will see all possible
+## log messages.
+#
+syslog_prioritymask {{ default .Env.SYSLOG_PRIORITYMASK "LOG_WARNING" }}
+
+
+#
+## send_tcp_keepalives
+##
+## This determines whether the SO_KEEPALIVE option will be set on all
+## sockets.
+#
+send_tcp_keepalives {{ default .Env.SEND_TCP_KEEPALIVES "no" }}
+
+
+#
+## enable_select_cache
+##
+## This configuration option allows you to turn select caching on or off.
+## When select caching is enabled, up-imapproxy will cache SELECT responses
+## from an imap server.
+#
+enable_select_cache {{ default .Env.ENABLE_SELECT_CACHE "no" }}
+
+
+#
+## foreground_mode
+##
+## This will prevent imapproxy from detaching from his parent process and
+## controlling terminal on startup.
+#
+foreground_mode yes
+
+
+#
+## force_tls
+##
+## Force imapproxy to use STARTTLS even if LOGIN is not disabled.
+#
+force_tls {{ default .Env.FORCE_TLS "yes" }}
+
+
+#
+## chroot_directory
+##
+## This allows imapproxy to run in a chroot jail if desired.
+## If commented out, imapproxy will not run chroot()ed.  If
+## a directory is specified here, imapproxy will chroot() to that
+## directory.
+#
+#chroot_directory /var/empty
+{{ if .Env.CHROOT_DIRECTORY }}
+chroot_directory {{ .Env.CHROOT_DIRECTORY }}
+{{ end }}
+
+
+#
+## enable_admin_commands
+##
+## Used to enable or disable the internal imapproxy administrative commands.
+#
+enable_admin_commands {{ default .Env.ENABLE_ADMIN_COMMANDS "no" }}
+
+
+#
+## Various path options for SSL CA certificates/directories
+#
+#tls_ca_file /usr/share/ssl/certs/ca-bundle.crt
+#tls_ca_path /usr/share/ssl/certs/
+#tls_cert_file /usr/share/ssl/certs/mycert.crt
+#tls_key_file /usr/share/ssl/certs/mycert.key
+{{ if .Env.TLS_CA_FILE }}
+tls_ca_file {{ .Env.TLS_CA_FILE }}
+{{ end }}
+{{ if .Env.TLS_CA_PATH }}
+tls_ca_path {{ .Env.TLS_CA_PATH }}
+{{ end }}
+{{ if .Env.TLS_CERT_FILE }}
+tls_cert_file {{ .Env.TLS_CERT_FILE }}
+{{ end }}
+{{ if .Env.TLS_KEY_FILE }}
+tls_key_file {{ .Env.TLS_KEY_FILE }}
+{{ end }}
