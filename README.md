@@ -31,7 +31,7 @@ a list of commonly used environment variables:
   default is `yes`
 
 For a list of environment variables and their default settings, see
-[imapproxy.conf.tmpl](imapproxy.conf.tmpl) file.
+[imapproxyd.conf.tmpl](imapproxyd.conf.tmpl) file.
 
 ## Author
 
